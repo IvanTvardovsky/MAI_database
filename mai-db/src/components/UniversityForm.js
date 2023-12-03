@@ -1,4 +1,3 @@
-// src/components/UniversityForm.js
 import React, { useState } from 'react';
 import axios from 'axios';
 
@@ -16,7 +15,7 @@ const UniversityForm = () => {
       };
 
       try {
-         const response = await axios.post('http://localhost:10000/test', requestData);
+         const response = await axios.get('http://localhost:5050/test', requestData);
          setBackendResponse(response.data);
       } catch (error) {
          console.error('Ошибка при отправке запроса:', error);

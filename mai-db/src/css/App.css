@@ -1,0 +1,63 @@
+@font-face {
+    font-family: 'Proxima Nova';
+    src: url('./fonts/ProximaNova-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.navbar {
+    display: flex;
+    margin: 0;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #adaaaa;
+    padding: 10px;
+    font-size: x-large;
+}
+
+.navbar-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+}
+
+.navbar-logo img {
+    height: 90px;
+}
+
+.navbar-menu {
+    flex-basis: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.navbar-menu-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.navbar-menu-list li {
+    display: inline-block;
+    margin-right: 70px;
+    padding-left: 40px;
+}
+
+.navbar-menu-list li:last-child {
+    margin-right: 0;
+}
+
+.navbar-menu-list li a {
+    text-decoration: none;
+    color: #f0ecce; /* текст в navbar на постоянке */
+}
+
+.navbar-menu-list li a:hover {
+    color: white; /* при наведении на текст в navbar */
+}
