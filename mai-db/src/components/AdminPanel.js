@@ -134,7 +134,7 @@ const AdminPanel = () => {
 
    useEffect(() => {
       fetchData(queryStringResult);
-   }, [queryStringResult]);
+   }, []);
 
    return (
       <div className="filter-panel">
