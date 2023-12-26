@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import "./../css/App.css"
 import queryString from 'query-string';
-import UniversityListAdmin from './UniversityListAdmin';
+import UniversityList from './UniversityList';
 
-const AdminPanel = () => {
+const FilterPanel = () => {
    const [filters, setFilters] = useState({
       score: '',
       budgetSeats: '',
@@ -56,50 +56,6 @@ const AdminPanel = () => {
       }
    };
 
-   const [selectedUniversity, setSelectedUniversity] = useState(null);
-
-   const handleEditClick = (universityId) => {
-      const selected = responseData.find((university) => university.id === universityId);
-      setSelectedUniversity(selected);
-   };
-
-   const handleEditInputChange = (field, value) => {
-      setSelectedUniversity((prev) => ({
-         ...prev,
-         [field]: value,
-      }));
-   };
-
-
-   const handleSaveChanges = async () => {
-      try {
-         const updatedUniversity = {
-            id: selectedUniversity.id,
-            price: parseInt(selectedUniversity.price),
-            places: parseInt(selectedUniversity.places),
-            subjects: selectedUniversity.subjects.map(subject => ({ ...subject })),
-            passingScore: parseInt(selectedUniversity.passingScore),
-            p_type: parseInt(selectedUniversity.p_type),
-            university: { ...selectedUniversity.university },
-         };
-
-         const response = await fetch(`http://localhost:5050/updateRecord`, {
-            method: 'PUT',
-            headers: {
-               'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(updatedUniversity),
-         });
-
-         setSelectedUniversity(null);
-
-         handleFilterClick();
-      } catch (error) {
-         console.error('Error updating data:', error);
-      }
-   };
-
-
    const handleFilterClick = () => {
       const queryParams = {
          subjects: Object.entries(filters.egeSubjects)
@@ -139,7 +95,6 @@ const AdminPanel = () => {
    return (
       <div className="filter-panel">
          <div className="filter-section">
-
             <label className="label">
                Проходной балл на платное
                <input
@@ -227,71 +182,15 @@ const AdminPanel = () => {
          </div>
 
          <div className="filter-buttons">
-            <button className="filter-button-admin" onClick={handleFilterClick}>
+            <button className="filter-button" onClick={handleFilterClick}>
                Применить фильтры
             </button>
 
          </div>
 
-         {selectedUniversity && (
-            <div className="edit-form">
-               <h2>
-                  Поменять данные: {selectedUniversity.university.name} - {selectedUniversity.name}
-                  {selectedUniversity.price === 0 ? ' (Бесплатное обучение)' : ` (Платное обучение: ${selectedUniversity.price} руб)`}
-               </h2>
-
-               <label>
-                  Цена за обучение:
-                  <input
-                     type="number"
-                     value={selectedUniversity.price}
-                     onChange={(e) => handleEditInputChange('price', e.target.value)}
-                  />
-               </label>
-               <label>
-                  Количество мест:
-                  <input
-                     type="number"
-                     value={selectedUniversity.places}
-                     onChange={(e) => handleEditInputChange('places', e.target.value)}
-                  />
-               </label>
-
-               <label>
-                  Проходной балл:
-                  <input
-                     type="number"
-                     value={selectedUniversity.passingScore}
-                     onChange={(e) => handleEditInputChange('passingScore', e.target.value)}
-                  />
-               </label>
-
-               <label>
-                  Присутствие военной кафедры:
-                  <input
-                     type="checkbox"
-                     checked={selectedUniversity.hasMilitaryDepartment}
-                     onChange={(e) => handleEditInputChange('hasMilitaryDepartment', e.target.checked)}
-                  />
-               </label>
-
-               <label>
-                  Государственный вуз:
-                  <input
-                     type="checkbox"
-                     checked={selectedUniversity.isStateUniversity}
-                     onChange={(e) => handleEditInputChange('isStateUniversity', e.target.checked)}
-                  />
-               </label>
-               {/* Add other editable fields here */}
-               <button onClick={handleSaveChanges}>Сохранить изменения</button>
-            </div>
-         )}
-
-         {responseData && <UniversityListAdmin universities={responseData} onEditClick={handleEditClick} />}
-
+         {responseData && <UniversityList universities={responseData}/>}
       </div>
    );
 };
 
-export default AdminPanel;
+export default FilterPanel;

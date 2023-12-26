@@ -1,12 +1,14 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Navbar from './components/NavBar';
-import PlaceholderUniversityForm from './components/placeHolder';
 import "./css/App.css"
+import Main from "./components/FilterPanel";
+import AdminPanel from "./components/AdminPanel";
+import PlaceHolder from "./components/placeHolder";
 
 const Home = () => (
    <div>
-      <p>траляля тополя описание инструмента и кнопка для перехода к фильтру университетов</p>
+      <h4 className="home">Куда поступать? Сайт для поступающих о вузах и поступлении на программы бакалавриата и специалитета.</h4>
    </div>
 );
 
@@ -16,8 +18,9 @@ const App = () => {
          <Navbar />
          <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/main" element={<PlaceholderUniversityForm />} />
-            <Route path="/admin" element={<PlaceholderUniversityForm />} />
+            <Route path="/main" element={<Main />} />
+            <Route path="/admin" element={<AdminPanel />} />
+            <Route path="/bebra" element={<PlaceHolder />} />
          </Routes>
       </BrowserRouter>
    );

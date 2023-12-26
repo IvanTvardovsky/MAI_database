@@ -1,41 +1,47 @@
 package config
 
 import (
-	"github.com/ilyakaznacheev/cleanenv"
-	"log"
-	"sync"
+	"backend/internal/schemas"
+	"github.com/joho/godotenv"
+	"os"
+	"strconv"
 )
 
-type Config struct {
-	IsDebug *bool         `yaml:"is_debug" env-required:"true"`
-	Listen  Listener      `yaml:"listen"`
-	Storage StorageConfig `yaml:"storage"`
+var ProjectConfig schemas.Config
+
+func createConfig() schemas.Config {
+	return schemas.Config{
+		DB: schemas.DatabaseConfig{
+			User:     "postgres",
+			Password: "bebra123",
+			Host:     "localhost",
+			Port:     "5432",
+			DBName:   "MAI_db",
+		},
+		Deploy: schemas.Deploy{
+			Port: 5050,
+		},
+	}
 }
 
-type Listener struct {
-	Type   string `yaml:"type"`
-	BindIp string `yaml:"bind_ip"`
-	Port   string `yaml:"port"`
+func getStrEnv(key string, defaultVal string) string {
+	if value, exists := os.LookupEnv(key); exists {
+		return value
+	}
+
+	return defaultVal
 }
 
-type StorageConfig struct {
-	Host     string `yaml:"host"`
-	Port     string `yaml:"port"`
-	Database string `yaml:"database"`
-	Username string `yaml:"username"`
-	Password string `yaml:"password"`
+func getIntEnv(key string, defaultVal int) int {
+	if value, exists := os.LookupEnv(key); exists {
+		intVal, _ := strconv.Atoi(value)
+		return intVal
+	}
+
+	return defaultVal
 }
 
-var instance *Config
-var once sync.Once
-
-func GetConfig() *Config {
-	once.Do(func() {
-		instance = &Config{}
-		if err := cleanenv.ReadConfig("../config.yml", instance); err != nil {
-			_, _ = cleanenv.GetDescription(instance, nil)
-			log.Fatal("Error reading config:", err)
-		}
-	})
-	return instance
+func init() {
+	godotenv.Load()
+	ProjectConfig = createConfig()
 }
