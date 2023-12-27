@@ -28,6 +28,29 @@ const AdminPanel = () => {
 
    const [queryStringResult, setQueryStringResult] = useState('');
    const [responseData, setResponseData] = useState(null);
+   const [numberOfRecords, setNumberOfRecords] = useState('');
+
+   const subjectNameMapping = {
+      'Математика': 'Mathematics',
+      'Физика': 'Physics',
+      'Русский язык': 'Russian',
+      'Биология': 'Biology',
+      'Английский язык': 'English',
+      'Информатика': 'Informatics',
+      'Литература': 'Literature',
+      'ДВИ': 'AEE',
+   };
+
+   const handleGetInfoClick = async () => {
+      try {
+         const response = await fetch(`http://localhost:5050/reportFilters?n=${numberOfRecords}`);
+         const blob = await response.blob();
+         const url = URL.createObjectURL(blob);
+         window.open(url);
+      } catch (error) {
+         console.error('Error getting information:', error);
+      }
+   };
 
    const handleInputChange = (e) => {
       const {name, value} = e.target;
@@ -38,20 +61,21 @@ const AdminPanel = () => {
    };
 
    const handleCheckboxChange = (e) => {
-      const {name, checked} = e.target;
+      const { name, checked } = e.target;
+      const englishSubjectName = subjectNameMapping[name] || name;
 
-      if (name in filters.egeSubjects) {
+      if (englishSubjectName in filters.egeSubjects) {
          setFilters((prevFilters) => ({
             ...prevFilters,
             egeSubjects: {
                ...prevFilters.egeSubjects,
-               [name]: checked,
+               [englishSubjectName]: checked,
             },
          }));
       } else {
          setFilters((prevFilters) => ({
             ...prevFilters,
-            [name]: checked,
+            [englishSubjectName]: checked,
          }));
       }
    };
@@ -188,15 +212,16 @@ const AdminPanel = () => {
             </label>
             {Object.entries(filters.egeSubjects).map(([subject, isChecked]) => {
                if (subject !== 'isStateUniversity' && subject !== 'hasMilitaryDepartment') {
+                  const russianSubjectName = Object.keys(subjectNameMapping).find(key => subjectNameMapping[key] === subject) || subject;
                   return (
                      <label key={subject} className="checkbox-label">
                         <input
                            type="checkbox"
-                           name={subject}
+                           name={russianSubjectName}
                            checked={isChecked}
                            onChange={handleCheckboxChange}
                         />
-                        {subject}
+                        {russianSubjectName}
                      </label>
                   );
                }
@@ -232,6 +257,18 @@ const AdminPanel = () => {
             </button>
 
          </div>
+
+         <label className="label">
+            Введите количество записей для отчета:
+            <input
+               type="number"
+               value={numberOfRecords}
+               onChange={(e) => setNumberOfRecords(e.target.value)}
+            />
+         </label>
+         <button className="filter-button-admin" onClick={handleGetInfoClick}>
+            Получить информацию по n записям
+         </button>
 
          {selectedUniversity && (
             <div className="edit-form">
@@ -283,8 +320,9 @@ const AdminPanel = () => {
                      onChange={(e) => handleEditInputChange('isStateUniversity', e.target.checked)}
                   />
                </label>
-               {/* Add other editable fields here */}
                <button onClick={handleSaveChanges}>Сохранить изменения</button>
+
+
             </div>
          )}
 

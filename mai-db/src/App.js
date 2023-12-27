@@ -20,7 +20,6 @@ const App = () => {
             <Route path="/" element={<Home />} />
             <Route path="/main" element={<Main />} />
             <Route path="/admin" element={<AdminPanel />} />
-            <Route path="/bebra" element={<PlaceHolder />} />
          </Routes>
       </BrowserRouter>
    );

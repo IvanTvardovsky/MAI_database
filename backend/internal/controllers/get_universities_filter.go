@@ -65,23 +65,22 @@ func getQueryParams(c *gin.Context, p *schemas.FiltersUni) {
 
 func postHistory(f schemas.FiltersUni) {
 	database, _ := db.GetDB()
-	s1 := `INSERT INTO history(date, budget_places, paid_places,budget_passing_score, paid_passing_score, paid_cost, is_state, has_military, subjects) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`
+	s1 := `INSERT INTO history(date, budget_places, paid_places,budget_passing_score, paid_passing_score, paid_cost, is_state, has_military, subjects, place) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`
 	sub := strings.Join(f.Subjects, ",")
 	var subP *string = nil
 	if len(sub) != 0 {
 		subP = &sub
 	}
-	_, err := database.Exec(s1, time.Now(), f.BudgetPlaces, f.PaidPlaces, f.BudgetScore, f.PaidScore, f.PaidScore, f.IsState, f.HasMilitary, subP)
+	if f.BudgetPlaces == nil && f.PaidPlaces == nil && f.BudgetScore == nil && f.PaidScore == nil && f.PaidScore == nil && f.IsState == nil && f.HasMilitary == nil && len(sub) == 0 && f.Place == nil {
+		return
+	}
+	_, err := database.Exec(s1, time.Now(), f.BudgetPlaces, f.PaidPlaces, f.BudgetScore, f.PaidScore, f.PaidScore, f.IsState, f.HasMilitary, subP, f.Place)
 	if err != nil {
 		log.Fatalln(err)
 	}
 }
 
 func GetUniversitiesDataFilter(c *gin.Context) {
-	//s := make(map[string]string)
-	//s["Russian"] = "Russian language"
-	//s["English"] = "English language"
-	//s["Additional entrance exams"] = "AEE"
 	database, _ := db.GetDB()
 	f := schemas.FiltersUni{}
 	getQueryParams(c, &f)
@@ -89,6 +88,7 @@ func GetUniversitiesDataFilter(c *gin.Context) {
 	const s10 = `SELECT u.id FROM university u`
 	ret := []schemas.University{}
 	rows, _ := database.Query(s10)
+	defer rows.Close()
 	for rows.Next() {
 		const s1 = `SELECT u.id, u.is_state_university, u.has_military_department, u.name, ur.place FROM university u, university_rating ur  WHERE ur.university_id = $1 AND u.id = $1`
 		const s2 = `SELECT up.id, up.passing_score, up.places, p.name, p.code  FROM university_program up JOIN program p ON up.program_id = p.id WHERE up.university_id = $1`
@@ -104,6 +104,7 @@ func GetUniversitiesDataFilter(c *gin.Context) {
 			continue
 		}
 		rows, _ := database.Query(s2, uni_id)
+
 	p:
 		for rows.Next() {
 			p := schemas.ProgramUniversity{}
@@ -134,23 +135,28 @@ func GetUniversitiesDataFilter(c *gin.Context) {
 				continue
 			}
 			rows, _ := database.Query(s5, p.Id)
+			subjectsProgram := make([]schemas.Subject, 0)
 			for rows.Next() {
 				s := schemas.Subject{}
 				rows.Scan(&s.IsChoosable, &s.Name)
-				if f.Subjects != nil {
+				subjectsProgram = append(subjectsProgram, s)
+			}
+			if f.Subjects != nil {
+				for _, sub := range f.Subjects {
 					flag := false
-					for _, el := range f.Subjects {
+					for _, sp := range subjectsProgram {
 						//log.Println(el)
-						if el == s.Name {
+						if sub == sp.Name {
 							flag = true
 						}
 					}
 					if !flag {
 						continue p
+						rows.Close()
 					}
 				}
-				p.Subjects = append(p.Subjects, s)
 			}
+			p.Subjects = subjectsProgram
 			uni.Programs = append(uni.Programs, p)
 			rows.Close()
 

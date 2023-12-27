@@ -22,7 +22,7 @@ func GetReport(c *gin.Context) {
 	v, has := c.GetQuery("n")
 	value, _ := strconv.Atoi(v)
 	report := schemas.Report{}
-	s1 := `SELECT date, budget_places, paid_places,budget_passing_score, paid_passing_score, paid_cost, is_state, has_military, subjects FROM history ORDER BY date`
+	s1 := `SELECT date, budget_places, paid_places,budget_passing_score, paid_passing_score, paid_cost, is_state, has_military, COALESCE(subjects, ''), place FROM history ORDER BY date DESC`
 	if has {
 		s1 += ` LIMIT $1`
 	}
@@ -36,11 +36,18 @@ func GetReport(c *gin.Context) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	dates := make([]time.Time, value)
+	defer rows.Close()
+	dates := make([]time.Time, 0)
 	for rows.Next() {
 		f := schemas.FiltersUni{}
 		sub := ""
-		rows.Scan(&dates[counter], &f.BudgetPlaces, &f.PaidPlaces, &f.BudgetScore, &f.PaidScore, &f.PaidScore, &f.IsState, &f.HasMilitary, &sub)
+		d := time.Time{}
+		err := rows.Scan(&d, &f.BudgetPlaces, &f.PaidPlaces, &f.BudgetScore, &f.PaidScore, &f.PaidScore, &f.IsState, &f.HasMilitary, &sub, &f.Place)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		log.Println(f.BudgetPlaces)
+		dates = append(dates, d)
 		t := make([]string, 0)
 		if sub != "" {
 			t = strings.Split(sub, ",")
@@ -77,13 +84,16 @@ func createPDF(r schemas.Report, d []time.Time) {
 	pdf.AddFont("Helvetica", "", "helvetica_1251.json")
 	pdf.SetFont("Helvetica", "", 12)
 	t := strconv.Itoa(len(r.Records))
-	count := len(r.Records)
 	tr := pdf.UnicodeTranslatorFromDescriptor("cp1251")
 	pdf.Write(7, tr("Всего запрошено записей: "+t+".\n\n"))
 	sumBudget := 0
+	countBudget := 0
 	sumPaid := 0
+	countPaid := 0
 	sumPlacesPaid := 0
+	countPlacesPaid := 0
 	sumPlacesBudget := 0
+	countPlacesBudget := 0
 
 	for i, e := range r.Records {
 		sb := strings.Builder{}
@@ -93,21 +103,25 @@ func createPDF(r schemas.Report, d []time.Time) {
 		sb.WriteString("Используемые параметры: ")
 		if e.BudgetPlaces != nil {
 			sumPlacesBudget += *e.BudgetPlaces
+			countPlacesBudget++
 			s := strconv.Itoa(*e.BudgetPlaces)
 			sb.WriteString("Количество бюджетных мест = " + s + ". ")
 		}
 		if e.PaidPlaces != nil {
 			sumPlacesPaid += *e.PaidPlaces
+			countPlacesPaid++
 			s := strconv.Itoa(*e.PaidPlaces)
 			sb.WriteString("Количество платных мест = " + s + ". ")
 		}
 		if e.PaidScore != nil {
 			sumPaid += *e.PaidScore
+			countPaid++
 			s := strconv.Itoa(*e.PaidScore)
 			sb.WriteString("Проходной балл на платку = " + s + ". ")
 		}
 		if e.BudgetScore != nil {
 			sumBudget += *e.BudgetScore
+			countBudget++
 			s := strconv.Itoa(*e.BudgetScore)
 			sb.WriteString("Проходной балл на бюджет = " + s + ". ")
 		}
@@ -141,10 +155,22 @@ func createPDF(r schemas.Report, d []time.Time) {
 		//pdf.CellFormat(0, 10, tr(sb.String()), "", 1, "", false, 0, "")
 		pdf.Write(7, tr(sb.String()))
 	}
-	srSumBudget := fmt.Sprintf("%f", math.Round(float64(sumBudget)/float64(count)))
-	srSumPaid := fmt.Sprintf("%f", math.Round(float64(sumPaid)/float64(count)))
-	srSumBudgetPlaces := fmt.Sprintf("%f", math.Round(float64(sumPlacesBudget)/float64(count)))
-	srSumPaidPlaces := fmt.Sprintf("%f", math.Round(float64(sumPlacesPaid)/float64(count)))
+	srSumBudget := fmt.Sprintf("%f", math.Round(float64(sumBudget)/float64(countBudget)))
+	if countBudget == 0 {
+		srSumBudget = "Фильтр ни разу не использовался"
+	}
+	srSumPaid := fmt.Sprintf("%f", math.Round(float64(sumPaid)/float64(countPaid)))
+	if countPaid == 0 {
+		srSumPaid = "Фильтр ни разу не использовался"
+	}
+	srSumBudgetPlaces := fmt.Sprintf("%f", math.Round(float64(sumPlacesBudget)/float64(countPlacesBudget)))
+	if countPlacesBudget == 0 {
+		srSumBudgetPlaces = "Фильтр ни разу не использовался"
+	}
+	srSumPaidPlaces := fmt.Sprintf("%f", math.Round(float64(sumPlacesPaid)/float64(countPlacesPaid)))
+	if countPlacesPaid == 0 {
+		srSumPaidPlaces = "Фильтр ни разу не использовался"
+	}
 	pdf.Write(7, tr("Среднее запрашиваемое количество бюджетных мест: "+srSumBudgetPlaces+".\n"))
 	pdf.Write(7, tr("Среднее запрашиваемое количество платных мест: "+srSumPaidPlaces+".\n"))
 	pdf.Write(7, tr("Среднее запрашиваемое количество бюджетных баллов: "+srSumBudget+".\n"))

@@ -29,6 +29,17 @@ const FilterPanel = () => {
    const [queryStringResult, setQueryStringResult] = useState('');
    const [responseData, setResponseData] = useState(null);
 
+   const subjectNameMapping = {
+      'Математика': 'Mathematics',
+      'Физика': 'Physics',
+      'Русский язык': 'Russian',
+      'Биология': 'Biology',
+      'Английский язык': 'English',
+      'Информатика': 'Informatics',
+      'Литература': 'Literature',
+      'ДВИ': 'AEE',
+   };
+
    const handleInputChange = (e) => {
       const {name, value} = e.target;
       setFilters((prevFilters) => ({
@@ -39,19 +50,20 @@ const FilterPanel = () => {
 
    const handleCheckboxChange = (e) => {
       const {name, checked} = e.target;
+      const englishSubjectName = subjectNameMapping[name] || name;
 
-      if (name in filters.egeSubjects) {
+      if (englishSubjectName in filters.egeSubjects) {
          setFilters((prevFilters) => ({
             ...prevFilters,
             egeSubjects: {
                ...prevFilters.egeSubjects,
-               [name]: checked,
+               [englishSubjectName]: checked,
             },
          }));
       } else {
          setFilters((prevFilters) => ({
             ...prevFilters,
-            [name]: checked,
+            [englishSubjectName]: checked,
          }));
       }
    };
@@ -143,15 +155,16 @@ const FilterPanel = () => {
             </label>
             {Object.entries(filters.egeSubjects).map(([subject, isChecked]) => {
                if (subject !== 'isStateUniversity' && subject !== 'hasMilitaryDepartment') {
+                  const russianSubjectName = Object.keys(subjectNameMapping).find(key => subjectNameMapping[key] === subject) || subject;
                   return (
                      <label key={subject} className="checkbox-label">
                         <input
                            type="checkbox"
-                           name={subject}
+                           name={russianSubjectName}
                            checked={isChecked}
                            onChange={handleCheckboxChange}
                         />
-                        {subject}
+                        {russianSubjectName}
                      </label>
                   );
                }
