@@ -81,6 +81,25 @@ func postHistory(f schemas.FiltersUni) {
 }
 
 func GetUniversitiesDataFilter(c *gin.Context) {
+	pMap := make(map[string]string)
+	pMap["Mathematics"] = "Математика"
+	pMap["Applied Mathematics and Computer Science"] = "Прикладная математика и компьютерные науки"
+	pMap["Mechanics and mathematical modeling"] = "Механика и математическое моделирование"
+	pMap["Applied Mathematics"] = "Прикладная математика"
+	pMap["Statistics"] = "Статистика"
+	pMap["Mathematics and Computer Science"] = "Математика и информатика"
+	pMap["Fundamental computer science and information technology"] = "Фундаментальная информатика и информационные технологии"
+	pMap["Mathematical support and administration of information systems"] = "Математическая поддержка и администрирование информационных систем"
+	pMap["Applied mathematics and physics"] = "Прикладная математика и физика"
+	pMap["Physics"] = "Физика"
+	pMap["Radiophysics"] = "Радиофизика"
+	pMap["Computer science and engineering"] = " Информатика и вычислительная техника"
+	pMap["Information systems and technologies"] = "Информационные системы и технологии"
+	pMap["Applied Computer Science"] = "Прикладная информатика"
+	pMap["Software Engineering"] = "Программная инженерия"
+	pMap["Information security"] = "Информационная безопасность"
+	pMap["Applied mechanics"] = "Прикладная механика"
+	pMap["Mechatronics and robotics"] = "Мехатроника и робототехника"
 	database, _ := db.GetDB()
 	f := schemas.FiltersUni{}
 	getQueryParams(c, &f)
@@ -141,7 +160,6 @@ func GetUniversitiesDataFilter(c *gin.Context) {
 				rows.Scan(&s.IsChoosable, &s.Name)
 				subjectsProgram = append(subjectsProgram, s)
 			}
-			cChoos := 1
 			if f.Subjects != nil {
 				for _, sub := range subjectsProgram {
 					flag := false
@@ -152,17 +170,15 @@ func GetUniversitiesDataFilter(c *gin.Context) {
 						}
 					}
 					if !flag {
-						if sub.IsChoosable && cChoos == 0 {
-							cChoos = 1
-						} else if sub.IsChoosable && cChoos == 1 {
+						if !sub.IsChoosable {
+							rows.Close()
 							continue p
 						}
-						continue p
-						rows.Close()
 					}
 				}
 			}
 			p.Subjects = subjectsProgram
+			p.Name = pMap[p.Name]
 			uni.Programs = append(uni.Programs, p)
 			rows.Close()
 

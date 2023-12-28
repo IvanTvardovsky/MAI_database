@@ -76,6 +76,15 @@ func GetReport(c *gin.Context) {
 }
 
 func createPDF(r schemas.Report, d []time.Time) {
+	rus := make(map[string]string)
+	rus["Mathematics"] = "Математика"
+	rus["Informatics"] = "Информатика"
+	rus["Russian"] = "Русский язык"
+	rus["English"] = "Английский язык" //
+	rus["Biology"] = "Биология"
+	rus["Literature"] = "Литература"
+	rus["Physics"] = "Физика"
+	rus["AEE"] = "ДВИ"
 	pdf := gofpdf.New("P", "mm", "A4", "")
 	pdf.SetCompression(true)
 	pdf.SetTopMargin(10)
@@ -147,7 +156,11 @@ func createPDF(r schemas.Report, d []time.Time) {
 			s := strconv.Itoa(*e.Place)
 			sb.WriteString("Место университета (не ниже данного): " + s + ". ")
 		}
+
 		if len(e.Subjects) != 0 {
+			for i := range e.Subjects {
+				e.Subjects[i] = rus[e.Subjects[i]]
+			}
 			s := strings.Join(e.Subjects, ",")
 			sb.WriteString("Предметы для сдачи: " + s + ".")
 		}

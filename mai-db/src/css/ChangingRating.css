@@ -1,0 +1,38 @@
+.rating-container {
+    position: relative;
+}
+
+.modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border: 1px solid #ccc;
+    z-index: 9999;
+}
+
+.modal-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-content label {
+    margin-bottom: 10px;
+}
+
+.modal-content button {
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.rating-list .changed {
+    background-color: #ffe4e1; /* Цвет подсветки для выделения измененного элемента */
+    padding: 5px;
+    margin-bottom: 5px;
+}

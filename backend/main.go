@@ -35,5 +35,6 @@ func main() {
 	r.GET("/reportFilters", controllers.GetReport)
 	r.GET("/places", controllers.GetRatingJSON)
 	r.PUT("/updateRecord", controllers.UpdateUniversity)
+	r.PUT("/updatePlace", controllers.ChangePlace)
 	r.Run(fmt.Sprintf("0.0.0.0:%d", config.ProjectConfig.Deploy.Port))
 }
