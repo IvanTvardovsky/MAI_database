@@ -5,6 +5,8 @@ import "./css/App.css"
 import Main from "./components/FilterPanel";
 import AdminPanel from "./components/AdminPanel";
 import PlaceHolder from "./components/placeHolder";
+import Rating from "./components/Rating";
+import ChangingRating from "./components/ChangingRating";
 
 const Home = () => (
    <div>
@@ -20,6 +22,8 @@ const App = () => {
             <Route path="/" element={<Home />} />
             <Route path="/main" element={<Main />} />
             <Route path="/admin" element={<AdminPanel />} />
+            <Route path="/rating" element={<Rating />} />
+            <Route path="/changeRating" element={<ChangingRating />} />
          </Routes>
       </BrowserRouter>
    );

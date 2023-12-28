@@ -21,7 +21,7 @@ func getQueryParams(c *gin.Context, p *schemas.FiltersUni) {
 		MilitaryParsed, _ := strconv.ParseBool(Military)
 		p.HasMilitary = &MilitaryParsed
 	}
-	PaidCost, has := c.GetQuery("paid_cost")
+	PaidCost, has := c.GetQuery("cost")
 	if has {
 		t, _ := strconv.Atoi(PaidCost)
 		p.PaidCost = &t
@@ -125,7 +125,7 @@ func GetUniversitiesDataFilter(c *gin.Context) {
 			if f.PaidPlaces != nil && p.P_type == 1 && p.Places < *f.PaidPlaces {
 				continue
 			}
-			if f.PaidCost != nil && p.P_type == 1 && p.Price < *f.PaidCost {
+			if (f.PaidCost != nil && p.P_type == 1 && p.Price > *f.PaidCost) || (f.PaidCost != nil && *f.PaidCost == 0 && p.P_type == 1) {
 				continue
 			}
 			if f.PaidScore != nil && p.P_type == 1 && p.PassingScore > *f.PaidScore {
@@ -141,16 +141,22 @@ func GetUniversitiesDataFilter(c *gin.Context) {
 				rows.Scan(&s.IsChoosable, &s.Name)
 				subjectsProgram = append(subjectsProgram, s)
 			}
+			cChoos := 1
 			if f.Subjects != nil {
-				for _, sub := range f.Subjects {
+				for _, sub := range subjectsProgram {
 					flag := false
-					for _, sp := range subjectsProgram {
+					for _, sp := range f.Subjects {
 						//log.Println(el)
-						if sub == sp.Name {
+						if sub.Name == sp {
 							flag = true
 						}
 					}
 					if !flag {
+						if sub.IsChoosable && cChoos == 0 {
+							cChoos = 1
+						} else if sub.IsChoosable && cChoos == 1 {
+							continue p
+						}
 						continue p
 						rows.Close()
 					}

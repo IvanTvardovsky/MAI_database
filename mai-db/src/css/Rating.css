@@ -1,0 +1,64 @@
+.rating-container {
+    max-width: 1400px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    margin-left: 20px;
+}
+
+.rating-list {
+    list-style: none;
+    padding: 0;
+}
+
+.rating-item {
+    margin-top: 10px;
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+}
+
+.rating-item strong {
+    font-size: 1.2em;
+}
+
+.rating-item p {
+    margin: 10px 0 0;
+    color: #666;
+}
+
+.filter-button-rating {
+    background-color: #4caf50;
+    color: white;
+    padding: 12px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    margin-top: 1000px;
+}
+
+.link-to-main {
+    /* Стили для ссылки "Вернуться к направлениям" */
+    text-decoration: none;
+    color: #3498db;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.button-download {
+    /* Стили для кнопки "Скачать отчет" */
+    background-color: #2ecc71;
+    color: #ffffff;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+.button-download:hover {
+    /* Стили при наведении на кнопку */
+    background-color: #27ae60;
+}

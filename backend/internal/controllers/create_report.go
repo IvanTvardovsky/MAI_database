@@ -22,7 +22,7 @@ func GetReport(c *gin.Context) {
 	v, has := c.GetQuery("n")
 	value, _ := strconv.Atoi(v)
 	report := schemas.Report{}
-	s1 := `SELECT date, budget_places, paid_places,budget_passing_score, paid_passing_score, paid_cost, is_state, has_military, COALESCE(subjects, ''), place FROM history ORDER BY date DESC`
+	s1 := `SELECT date, budget_places, paid_places,budget_passing_score, paid_passing_score, paid_cost, is_state, has_military, COALESCE(subjects, ''), place FROM history ORDER BY id DESC`
 	if has {
 		s1 += ` LIMIT $1`
 	}

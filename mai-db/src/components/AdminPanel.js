@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import "./../css/App.css"
 import queryString from 'query-string';
 import UniversityListAdmin from './UniversityListAdmin';
+import {Link} from "react-router-dom";
 
 const AdminPanel = () => {
    const [filters, setFilters] = useState({
@@ -131,7 +132,7 @@ const AdminPanel = () => {
             .map(([subject]) => subject),
          military: filters.hasMilitaryDepartment ? 1 : undefined,
          state: filters.isStateUniversity ? 1 : undefined,
-         paid_cost: filters.tuitionFee || undefined,
+         cost: filters.tuitionFee || undefined,
          paid_places: filters.paidSeats || undefined,
          budget_places: filters.budgetSeats || undefined,
          place: filters.universityRating || undefined,
@@ -201,7 +202,7 @@ const AdminPanel = () => {
             </label>
 
             <label className="label">
-               Цена платного обучения
+               Цена обучения
                <input type="number" name="tuitionFee" value={filters.tuitionFee} onChange={handleInputChange}/>
             </label>
          </div>
@@ -259,16 +260,24 @@ const AdminPanel = () => {
          </div>
 
          <label className="label">
-            Введите количество записей для отчета:
+            Введите количество запросов для отчета:
             <input
                type="number"
                value={numberOfRecords}
                onChange={(e) => setNumberOfRecords(e.target.value)}
             />
          </label>
-         <button className="filter-button-admin" onClick={handleGetInfoClick}>
-            Получить информацию по n записям
-         </button>
+
+         <div className="filter-buttons">
+            <button className="filter-button-admin" onClick={handleGetInfoClick}>
+               Получить информацию по запросам
+            </button>
+            <Link to="/changingRating">
+               <button className="filter-button-admin">
+                  Изменить рейтинг
+               </button>
+            </Link>
+         </div>
 
          {selectedUniversity && (
             <div className="edit-form">

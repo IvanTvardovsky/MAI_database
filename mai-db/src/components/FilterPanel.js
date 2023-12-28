@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react';
+import { Link } from 'react-router-dom';
 import "./../css/App.css"
 import queryString from 'query-string';
 import UniversityList from './UniversityList';
@@ -49,7 +50,7 @@ const FilterPanel = () => {
    };
 
    const handleCheckboxChange = (e) => {
-      const {name, checked} = e.target;
+      const { name, checked } = e.target;
       const englishSubjectName = subjectNameMapping[name] || name;
 
       if (englishSubjectName in filters.egeSubjects) {
@@ -75,7 +76,7 @@ const FilterPanel = () => {
             .map(([subject]) => subject),
          military: filters.hasMilitaryDepartment ? 1 : undefined,
          state: filters.isStateUniversity ? 1 : undefined,
-         paid_cost: filters.tuitionFee || undefined,
+         cost: filters.tuitionFee || undefined,
          paid_places: filters.paidSeats || undefined,
          budget_places: filters.budgetSeats || undefined,
          place: filters.universityRating || undefined,
@@ -144,7 +145,7 @@ const FilterPanel = () => {
             </label>
 
             <label className="label">
-               Цена платного обучения
+               Цена обучения
                <input type="number" name="tuitionFee" value={filters.tuitionFee} onChange={handleInputChange}/>
             </label>
          </div>
@@ -198,7 +199,11 @@ const FilterPanel = () => {
             <button className="filter-button" onClick={handleFilterClick}>
                Применить фильтры
             </button>
-
+            <Link to="/rating">
+               <button className="filter-button">
+                  Показать рейтинг
+               </button>
+            </Link>
          </div>
 
          {responseData && <UniversityList universities={responseData}/>}
