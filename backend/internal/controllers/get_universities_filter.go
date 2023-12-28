@@ -82,6 +82,25 @@ func postHistory(f schemas.FiltersUni) {
 
 func GetUniversitiesDataFilter(c *gin.Context) {
 	pMap := make(map[string]string)
+	rus := make(map[string]string)
+	uniRus := make(map[string]string)
+	uniRus["Moscow Aviation Institute"] = "Московский авиационный институт"
+	uniRus["Bauman Moscow State Technical University"] = "МГТУ им. Н.Э. Баумана"
+	uniRus["M. V. Lomonosov Moscow State University"] = "Московский государственный университет имени М.В.Ломоносова"
+	uniRus["Higher School of Economics"] = "Высшая школа экономики"
+	uniRus["Moscow Institute of Physics and Technology"] = "МФТИ"
+	uniRus["Siberian Federal University"] = "Сибирский федеральный университет"
+	uniRus["MISIS"] = "МИСИС"
+	uniRus["Moscow Power Engineering Institute (MPEI)"] = "МЭИ"
+
+	rus["Mathematics"] = "Математика"
+	rus["Informatics"] = "Информатика"
+	rus["Russian"] = "Русский язык"
+	rus["English"] = "Английский язык" //
+	rus["Biology"] = "Биология"
+	rus["Literature"] = "Литература"
+	rus["Physics"] = "Физика"
+	rus["AEE"] = "ДВИ"
 	pMap["Mathematics"] = "Математика"
 	pMap["Applied Mathematics and Computer Science"] = "Прикладная математика и компьютерные науки"
 	pMap["Mechanics and mathematical modeling"] = "Механика и математическое моделирование"
@@ -119,6 +138,7 @@ func GetUniversitiesDataFilter(c *gin.Context) {
 		rows.Scan(&uni_id)
 		row := database.QueryRow(s1, uni_id)
 		row.Scan(&uni.Id, &uni.IsState, &uni.HasMilitary, &uni.Name, &uni.Place)
+		uni.Name = uniRus[uni.Name]
 		if f.Place != nil && uni.Place > *f.Place {
 			continue
 		}
@@ -176,6 +196,9 @@ func GetUniversitiesDataFilter(c *gin.Context) {
 						}
 					}
 				}
+			}
+			for i := range subjectsProgram {
+				subjectsProgram[i].Name = rus[subjectsProgram[i].Name]
 			}
 			p.Subjects = subjectsProgram
 			p.Name = pMap[p.Name]
